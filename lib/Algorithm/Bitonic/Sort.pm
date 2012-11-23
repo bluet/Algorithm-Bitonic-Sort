@@ -16,6 +16,7 @@ BEGIN {
 
 # "A supercomputer is a device for turning compute-bound problems into I/O-bound problems."
 
+=encoding utf8
 
 =head1 NAME
 
@@ -83,10 +84,10 @@ sub bitonic_sort {
 	my @first = bitonic_sort( 1, @num[0..(@num /2 -1)] );
         my @second = bitonic_sort( 0, @num[(@num /2)..(@num -1)] );
         
-        return bitonic_merge( $up, @first, @second );
+        return _bitonic_merge( $up, @first, @second );
 }
 
-sub bitonic_merge {
+sub _bitonic_merge {
 	my $up = shift;
 	say '#### Merge: '.Dumper(@_) if DEBUG;
 	
@@ -94,17 +95,17 @@ sub bitonic_merge {
 	return @_ if int @_ == 1;
 	
 	my @num = @_;
-	@num = bitonic_compare( $up, @num );
+	@num = _bitonic_compare( $up, @num );
 	
-	my @first = bitonic_merge( $up, @num[0..(@num /2 -1)]);
-	my @second = bitonic_merge( $up, @num[(@num /2)..(@num -1)]);
+	my @first = _bitonic_merge( $up, @num[0..(@num /2 -1)]);
+	my @second = _bitonic_merge( $up, @num[(@num /2)..(@num -1)]);
 	
 	say "#####\n# Merge Result\n#####\n".Dumper(@first, @second)  if DEBUG;
 	
 	return (@first, @second);
 }
 
-sub bitonic_compare {
+sub _bitonic_compare {
 	my $up = shift;
 	say '#### Compare: '.Dumper(@_) if DEBUG;
 	my @num = @_;
@@ -175,6 +176,8 @@ L<https://github.com/BlueT/Algorithm-Bitonic-Sort>
 
 =head1 SEE ALSO
 
+=over 4
+
 =item * Batcher's web page at Kent State University
 
 L<http://www.cs.kent.edu/~batcher/>
@@ -183,7 +186,7 @@ L<http://www.cs.kent.edu/~batcher/>
 
 L<http://en.wikipedia.org/wiki/Bitonic_sorter>
 
-
+=back
 
 =head1 LICENSE AND COPYRIGHT
 
