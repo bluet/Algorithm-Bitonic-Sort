@@ -3,9 +3,11 @@ package Algorithm::Bitonic::Sort;
 use utf8;
 use feature 'say';
 use common::sense;
-use Data::Dumper::Simple;
-use constant DEBUG => $ENV{ALGORITHM_BITONIC_SORT};
+use constant DEBUG => $ENV{ALGORITHM_BITONIC_SORT_DEBUG};
 
+if (DEBUG) {
+	use Data::Dumper::Simple;
+}
 
 our (@ISA, @EXPORT);
 BEGIN {
@@ -80,46 +82,112 @@ sub bitonic_sort {
 	
 	return @_ if int @_ <= 1;
 	
+	my $single_bit = shift @_ if @_ % 2;
+	$single_bit //= 'NA';
+	
+	say Dumper $single_bit if DEBUG;
+	
 	my @num = @_;
 	my @first = bitonic_sort( 1, @num[0..(@num /2 -1)] );
         my @second = bitonic_sort( 0, @num[(@num /2)..(@num -1)] );
         
-        return _bitonic_merge( $up, @first, @second );
+        #~ return _bitonic_merge( $up, @first, @second );
+        return _bitonic_merge( $up, $single_bit, @first, @second );
+        #~ return _bitonic_merge( $up, $single_bit, \@first, \@second );
 }
 
 sub _bitonic_merge {
 	my $up = shift;
 	say '#### Merge: '.Dumper(@_) if DEBUG;
 	
+	my $single_bit = shift;
+	say Dumper $single_bit if DEBUG;
+	#~ my $first = shift;		# ARRAY ref
+	#~ my $second = shift;		# ARRAY ref
+	
 	# assume input @num is bitonic, and sorted list is returned 
 	return @_ if int @_ == 1;
 	
+	my $single_bit_2 = shift @_ if @_ % 2;
+	$single_bit_2 //= 'NA';
+	
 	my @num = @_;
 	@num = _bitonic_compare( $up, @num );
+	#~ @num = _bitonic_compare( $up, $first, $second );
 	
-	my @first = _bitonic_merge( $up, @num[0..(@num /2 -1)]);
-	my @second = _bitonic_merge( $up, @num[(@num /2)..(@num -1)]);
+	#~ my @first = _bitonic_merge( $up, @num[0..(@num /2 -1)] );
+	#~ my @second = _bitonic_merge( $up, @num[(@num /2)..(@num -1)] );
+	#~ my @first = _bitonic_merge( $up, $single_bit, @num[0..(@num /2 -1)] );
+	#~ my @second = _bitonic_merge( $up, $single_bit, @num[(@num /2)..(@num -1)] );
+	my @first = _bitonic_merge( $up, 'NA', @num[0..(@num /2 -1)] );
+	my @second = _bitonic_merge( $up, 'NA', @num[(@num /2)..(@num -1)] );
 	
-	say "#####\n# Merge Result\n#####\n".Dumper(@first, @second)  if DEBUG;
+	@num = _some_sorting_algorithm( $up, $single_bit, @first, @second ) if $single_bit ne 'NA';
+	@num = _some_sorting_algorithm( $up, $single_bit_2, @first, @second ) if $single_bit_2 ne 'NA';
 	
-	return (@first, @second);
+	say "#####\n# Merge Result\n#####\n".Dumper(@num)  if DEBUG;
+	
+	return (@num);
 }
 
 sub _bitonic_compare {
 	my $up = shift;
 	say '#### Compare: '.Dumper(@_) if DEBUG;
 	my @num = @_;
-	my $dist = int @num /2;
+	#~ my $first = shift;		# ARRAY ref
+	#~ my $second = shift;		# ARRAY ref
+	#~ say Dumper $first;
 	
+	my $dist = int @num /2;
+	#~ 
 	for my $i (0..$dist-1) {
+		say "i=$i, dist=$dist, $num[$i] > $num[$i+$dist]) == $up" if DEBUG;
 		if ( ($num[$i] > $num[$i+$dist]) == $up ) {
+			say "Swapping....." if DEBUG;
 			($num[$i], $num[$i+$dist]) = ($num[$i+$dist], $num[$i]);	#swap
 		}
 	}
+	#~ for my $i (0..(int @$first)) {
+		#~ if ( ($first->[$i] > $second->[$i]) == $up ) {
+			#~ ($first->[$i], $second->[$i]) = ($second->[$i], $first->[$i]);	#swap
+		#~ }
+	#~ }
 	
+	say 'Compared result:'.Dumper(@num) if DEBUG;
 	return @num;
+	#~ return ($first, $second);
 }
 
+
+sub _some_sorting_algorithm {
+	my $up = shift;
+	my $single_bit = shift;
+	my @num = @_;
+	my @num_new;
+	
+	say "_SOME_SORTING_ALGORITHM: INPUT: ".Dumper(@num) if DEBUG;
+	
+	while (my $curr = shift @num) {
+		say "_SOME_SORTING_ALGORITHM: for: ".Dumper($curr, $single_bit, @num) if DEBUG;
+		if ($up and $single_bit < $curr) {
+			push @num_new, $single_bit;
+			push @num_new, $curr;
+			say "Return earlier, up is ".($up or '0').':'.Dumper(@num_new, @num) if DEBUG;
+			return (@num_new, @num);
+		} elsif ($single_bit > $curr and not $up) {
+			push @num_new, $single_bit;
+			push @num_new, $curr;
+			say "Return earlier, up is ".($up or '0').':'.Dumper(@num_new, @num) if DEBUG;
+			return (@num_new, @num)
+		} else {
+			push @num_new, $curr;
+		}
+	}
+	
+	push @num_new, $single_bit;
+	say "Return normal, ".Dumper(@num_new, @num) if DEBUG;
+	return @num_new;
+}
 
 =head1 AUTHOR
 
