@@ -6,7 +6,7 @@ use common::sense;
 use constant DEBUG => $ENV{ALGORITHM_BITONIC_SORT_DEBUG};
 
 if (DEBUG) {
-	use Data::Dumper::Simple;
+	require Data::Dumper::Simple;
 }
 
 our (@ISA, @EXPORT);
@@ -26,11 +26,11 @@ Algorithm::Bitonic::Sort - Sorting numbers with Bitonic Sort
 
 =head1 VERSION
 
-Version 0.01
+Version 0.03
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 
 =head1 SYNOPSIS
