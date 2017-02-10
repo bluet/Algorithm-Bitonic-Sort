@@ -1,5 +1,8 @@
 Revision history for Algorithm-Bitonic-Sort
 
+0.05	Fri Feb 10 14:16:08 CST 2017
+	update docs
+
 0.04	Fri Feb 10 13:01:28 CST 2017
 	- fixed: works again
 
@@ -11,4 +14,3 @@ Revision history for Algorithm-Bitonic-Sort
 
 0.01    Sat Nov 24 02:16:03 CST 2012
         First version, released on an unsuspecting world.
-

@@ -26,11 +26,11 @@ Algorithm::Bitonic::Sort - Sorting numbers with Bitonic Sort
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 
 =head1 SYNOPSIS
@@ -39,21 +39,21 @@ Use L<Algorithm::Bitonic::Sort> with the following style.
 
 	use Algorithm::Bitonic::Sort;
 	
-	my @sample = (1,4,8,4,4365,67,33,345);
-	my @result_up	= bitonic_sort( 1 ,@sample);	# incremental
-	my @result_down	= bitonic_sort( 0 ,@sample);	# decremental
+	my @sample = (1,4,8,4,4365,2,67,33,345);
+	my @result_inc = bitonic_sort( 1 ,@sample);	# incremental
+	my @result_dec = bitonic_sort( 0 ,@sample);	# decremental
 
 =head1 DESCRIPTION
 
+Bitonic mergesort is a parallel algorithm for sorting. It is also used as a construction method for building a sorting network.
 This is an Perl 5 implementation of Ken Batcher's Bitonic mergesort.
-
 
 =head1 Limitation
 
-The original Bitonic can only sort N numbers, which N is a power of 2.
+This is a enhanced version of Bitonic Sort which removed the limitation of original version.
+This module supports any amount of numbers.
 
-Which means that you can sort a set of numbers (an array or list) which 
-contains 2 (2**1) or 4 (2**2) or 8 (2**3) or any 2**M amount of members.
+The original Bitonic can only sort N numbers, which N is a power of 2.
 
 
 =head1 EXPORT
@@ -65,14 +65,12 @@ bitonic_sort
 
 =head2 bitonic_sort
 
-Accepts the first param as the ascending/decreasing selector.
+The First Parameter works as the ascending/decreasing selector.
 True (1 or any true value) means ascending (incremental),
 False (0 or any false value) means decreasing.
 
-All the rest params will treat as members/items to be sorted.
+All other params will be treated as members/items to be sorted.
 
-WARNING:
-Giving any amount of members not equal to 2**N will have unexpected result and fail.
 
 =cut
 
@@ -89,11 +87,9 @@ sub bitonic_sort {
 	
 	my @num = @_;
 	my @first = bitonic_sort( 1, @num[0..(@num /2 -1)] );
-        my @second = bitonic_sort( 0, @num[(@num /2)..(@num -1)] );
-        
-        #~ return _bitonic_merge( $up, @first, @second );
-        return _bitonic_merge( $up, $single_bit, @first, @second );
-        #~ return _bitonic_merge( $up, $single_bit, \@first, \@second );
+	my @second = bitonic_sort( 0, @num[(@num /2)..(@num -1)] );
+	
+	return _bitonic_merge( $up, $single_bit, @first, @second );
 }
 
 sub _bitonic_merge {
@@ -102,8 +98,6 @@ sub _bitonic_merge {
 	
 	my $single_bit = shift;
 	say Dumper $single_bit if DEBUG;
-	#~ my $first = shift;		# ARRAY ref
-	#~ my $second = shift;		# ARRAY ref
 	
 	# assume input @num is bitonic, and sorted list is returned 
 	return @_ if int @_ == 1;
@@ -113,12 +107,7 @@ sub _bitonic_merge {
 	
 	my @num = @_;
 	@num = _bitonic_compare( $up, @num );
-	#~ @num = _bitonic_compare( $up, $first, $second );
 	
-	#~ my @first = _bitonic_merge( $up, @num[0..(@num /2 -1)] );
-	#~ my @second = _bitonic_merge( $up, @num[(@num /2)..(@num -1)] );
-	#~ my @first = _bitonic_merge( $up, $single_bit, @num[0..(@num /2 -1)] );
-	#~ my @second = _bitonic_merge( $up, $single_bit, @num[(@num /2)..(@num -1)] );
 	my @first = _bitonic_merge( $up, 'NA', @num[0..(@num /2 -1)] );
 	my @second = _bitonic_merge( $up, 'NA', @num[(@num /2)..(@num -1)] );
 	
@@ -135,9 +124,6 @@ sub _bitonic_compare {
 	my $up = shift;
 	say '#### Compare: '.Dumper(@_) if DEBUG;
 	my @num = @_;
-	#~ my $first = shift;		# ARRAY ref
-	#~ my $second = shift;		# ARRAY ref
-	#~ say Dumper $first;
 	
 	my $dist = int @num /2;
 	#~ 
@@ -194,11 +180,25 @@ sub _some_sorting_algorithm {
 
 BlueT - Matthew Lien - 練喆明, C<< <BlueT at BlueT.org> >>
 
+
+=head1 INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Or install with cpanm
+
+	cpanm Algorithm::Bitonic::Sort
+
+
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-algorithm-bitonic-sort at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Algorithm-Bitonic-Sort>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests to CPAN ( C<bug-algorithm-bitonic-sort at rt.cpan.org>, L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Algorithm-Bitonic-Sort> ) or GitHub (L<https://github.com/BlueT/Algorithm-Bitonic-Sort/issues>).
+I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 
 
@@ -259,7 +259,7 @@ L<http://en.wikipedia.org/wiki/Bitonic_sorter>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012 BlueT - Matthew Lien - 練喆明.
+Copyright 2012-2017 BlueT - Matthew Lien - 練喆明.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
