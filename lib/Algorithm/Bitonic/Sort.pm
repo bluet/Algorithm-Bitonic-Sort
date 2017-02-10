@@ -26,11 +26,11 @@ Algorithm::Bitonic::Sort - Sorting numbers with Bitonic Sort
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 
 =head1 SYNOPSIS
@@ -122,6 +122,7 @@ sub _bitonic_merge {
 	my @first = _bitonic_merge( $up, 'NA', @num[0..(@num /2 -1)] );
 	my @second = _bitonic_merge( $up, 'NA', @num[(@num /2)..(@num -1)] );
 	
+	@num = (@first, @second);
 	@num = _some_sorting_algorithm( $up, $single_bit, @first, @second ) if $single_bit ne 'NA';
 	@num = _some_sorting_algorithm( $up, $single_bit_2, @first, @second ) if $single_bit_2 ne 'NA';
 	
