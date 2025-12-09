@@ -112,8 +112,8 @@ sub _bitonic_merge {
 	my @second = _bitonic_merge( $up, 'NA', @num[(@num /2)..(@num -1)] );
 	
 	@num = (@first, @second);
-	@num = _some_sorting_algorithm( $up, $single_bit, @first, @second ) if $single_bit ne 'NA';
-	@num = _some_sorting_algorithm( $up, $single_bit_2, @first, @second ) if $single_bit_2 ne 'NA';
+	@num = _some_sorting_algorithm( $up, $single_bit, @num ) if $single_bit ne 'NA';
+	@num = _some_sorting_algorithm( $up, $single_bit_2, @num ) if $single_bit_2 ne 'NA';
 	
 	say "#####\n# Merge Result\n#####\n".Dumper(@num)  if DEBUG;
 	
@@ -151,28 +151,19 @@ sub _some_sorting_algorithm {
 	my $single_bit = shift;
 	my @num = @_;
 	my @num_new;
-	
-	say "_SOME_SORTING_ALGORITHM: INPUT: ".Dumper(@num) if DEBUG;
-	
-	while (my $curr = shift @num) {
-		say "_SOME_SORTING_ALGORITHM: for: ".Dumper($curr, $single_bit, @num) if DEBUG;
-		if ($up and $single_bit < $curr) {
+	my $inserted = 0;
+
+	for my $curr (@num) {
+		if (!$inserted && (($up && $single_bit < $curr) || (!$up && $single_bit > $curr))) {
 			push @num_new, $single_bit;
-			push @num_new, $curr;
-			say "Return earlier, up is ".($up or '0').':'.Dumper(@num_new, @num) if DEBUG;
-			return (@num_new, @num);
-		} elsif ($single_bit > $curr and not $up) {
-			push @num_new, $single_bit;
-			push @num_new, $curr;
-			say "Return earlier, up is ".($up or '0').':'.Dumper(@num_new, @num) if DEBUG;
-			return (@num_new, @num)
-		} else {
-			push @num_new, $curr;
+			$inserted = 1;
 		}
+		push @num_new, $curr;
 	}
-	
-	push @num_new, $single_bit;
-	say "Return normal, ".Dumper(@num_new, @num) if DEBUG;
+
+	if (!$inserted) {
+		push @num_new, $single_bit;
+	}
 	return @num_new;
 }
 
